@@ -1,7 +1,7 @@
-const response = (message,res) => {
+const response = (message,results) => {
     return {
         message,
-        res
+        results
     }
 }
 
