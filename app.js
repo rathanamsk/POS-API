@@ -9,7 +9,8 @@ const indexRouter = require("./src/routes/index");
 const dbConnection = require("./src/lib/mongo.connection");
 const { expressjwt: expressJwt } = require("express-jwt");
 const UserSession = require("./src/models/userSession");
-const authRouter = require('./src/routes/auth')
+const authRouter = require('./src/routes/auth/auth')
+const userRouter = require('./src/routes/auth/user')
 const app = express();
 
 // db connection start
@@ -26,7 +27,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 
-const WHITE_LIST_URL = ["/user"];
+const WHITE_LIST_URL = [
+  "/auth/signup",
+  "/auth/login"
+];
 
 const jwt = () => {
   return expressJwt({
@@ -45,7 +49,9 @@ const auth = async (req, res, next) => {
 };
 
 app.use("/", indexRouter);
-app.use("/auth", authRouter)
+app.use("/auth", jwt(), auth, authRouter)
+app.use("/auth", jwt(), auth, userRouter)
+
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
