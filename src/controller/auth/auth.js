@@ -1,10 +1,10 @@
 const jwt = require("jsonwebtoken");
-const User = require("../models/user");
-const Store = require("../models/store");
-const UserSession = require('../models/userSession')
-const { response } = require("../common/response");
+const User = require("../../models/user");
+const Store = require("../../models/store");
+const UserSession = require('../../models/userSession')
+const { response } = require("../../common/response");
 const bcrypt = require("bcrypt");
-const enumType = require('../common/enum')
+const enumType = require('../../common/enum')
 
 
 module.exports = {
@@ -34,9 +34,11 @@ module.exports = {
         return res.status(400).send(response("Store location is require"));
 
       // find any existing data
-      const user = await User.findOne({ email, phoneNumber });
+      const emailUser = await User.findOne({ email });
+      const phoneNumberUser = await User.findOne({ phoneNumber })
       const store = await Store.findOne({ storeName });
-      if (user) return res.status(400).send(response("User already exist"));
+      if (emailUser) return res.status(400).send(response("User email already exist"));
+      if (phoneNumberUser) return res.status(400).send(response("User phone number already exist"))
       if (store)
         return res.status(400).send(response("This store already token"));
 
@@ -68,9 +70,10 @@ module.exports = {
         if (!password) return res.status(400).send(response('Password is require!'))
         const user = await User.findOne({ email })
         if (!user) return res.status(400).send(response("User not found"))
-        if (!bcrypt.compare(password, user.password)) return res.status(400).send(response("Password invalid"))
+        if (! await bcrypt.compare(password, user.password)) return res.status(400).send(response("Password invalid"))
         const payload = {
             email,
+            id: user.id,
             phoneNumber: user.phoneNumber,
             storeId: user.storeId,
             role: user.role
@@ -85,6 +88,19 @@ module.exports = {
     }catch(err){
         console.log(err);
         return res.status(500).send(response('fail to login'))
+    }
+  },
+
+  async logout(req,res) {
+    try {
+      const token = req.get('authorization').split(' ')[1]
+      if (!token) return res.status(400).send(response("token not found"))
+      await UserSession.deleteOne({ token })
+      return res.status(200).send(response('successful logout'))
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send(response('fail to logout'))
+      
     }
   }
 };
