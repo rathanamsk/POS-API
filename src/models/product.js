@@ -1,6 +1,4 @@
 const mongoose = require("mongoose");
-const enumType = require('../common/enum')
-
 const productSchema = new mongoose.Schema({
     categoriesId: {
         type: mongoose.Schema.ObjectId,
