@@ -117,4 +117,39 @@ module.exports = {
       return res.status(500).send(response("Product delete fail"));
     }
   },
+  async searchProduct(req, res) {
+    try {
+      const id = req.params.id;
+      const { categoryId, productName, productImage, quantity, price } =
+        req.body;
+      var check = 0;
+      //Product validation
+      if (!id) check++;
+      if (!categoryId) check++;
+      if (!productName) check++;
+      if (!productImage) check++;
+      if (!quantity) check++;
+      if (!price) check++;
+      if (check < 6) {
+        const pro = await product.find({
+          _id: new ObjectID(id),
+          categoriesId: categoryId,
+          productImage: productImage,
+          price: price,
+          productName:productName,
+          quantity:quantity,
+          status:"active"
+        });
+
+        return res.status(200).send(pro);
+      }else{
+        return res.status(400).send("please provide any name or anything else you want to search on product")
+      }
+
+      // find any existing data
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send(response("Product delete fail"));
+    }
+  },
 };
