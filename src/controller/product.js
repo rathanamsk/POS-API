@@ -1,6 +1,7 @@
 const product = require("../models/product");
 const { response } = require("../common/response");
 const ObjectID = require("mongodb").ObjectID;
+const category = require("../models/catrgory");
 module.exports = {
   //create product
   async cerateProduct(req, res) {
@@ -130,26 +131,30 @@ module.exports = {
       if (!productImage) check++;
       if (!quantity) check++;
       if (!price) check++;
+      req.body.status="active"
       if (check < 6) {
-        const pro = await product.find({
-          _id: new ObjectID(id),
-          categoriesId: categoryId,
-          productImage: productImage,
-          price: price,
-          productName:productName,
-          quantity:quantity,
-          status:"active"
+        const pro = await product.find(req.body);
+        console.log(pro);
+        const cate = await category.findOne({
+          _id: new ObjectID(pro[0].categoriesId),
         });
 
+        for (let i = 0; i < pro.length; i++) {
+          pro[i].categoriesId = cate;
+        }
         return res.status(200).send(pro);
-      }else{
-        return res.status(400).send("please provide any name or anything else you want to search on product")
+      } else {
+        return res
+          .status(400)
+          .send(
+            "please provide any name or anything else you want to search on product"
+          );
       }
 
       // find any existing data
     } catch (err) {
       console.log(err);
-      return res.status(500).send(response("Product delete fail"));
+      return res.status(500).send(response("Product search fail"));
     }
   },
 };
