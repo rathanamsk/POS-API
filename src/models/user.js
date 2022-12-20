@@ -23,7 +23,8 @@ const userSchema = new mongoose.Schema({
         require: true
     },
     profile: {
-        type: String
+        type: String,
+        default: "https://firebasestorage.googleapis.com/v0/b/pos-storage-a40e8.appspot.com/o/profile%2Fprofile.png?alt=media&token=881245f8-d34e-4844-90bd-1078a2c2ffb2"
     },
     createdBy: {
         type: mongoose.Schema.ObjectId,

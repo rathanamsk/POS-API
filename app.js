@@ -11,10 +11,13 @@ const { expressjwt: expressJwt } = require("express-jwt");
 const UserSession = require("./src/models/userSession");
 const authRouter = require('./src/routes/auth/auth')
 const userRouter = require('./src/routes/auth/user')
+const firebase= require('./src/lib/firebase.storage')
 const app = express();
 
 // db connection start
 dbConnection();
+
+firebase()
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -29,7 +32,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const WHITE_LIST_URL = [
   "/auth/signup",
-  "/auth/login"
+  "/auth/login",
 ];
 
 const jwt = () => {
