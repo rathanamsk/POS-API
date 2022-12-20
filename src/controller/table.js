@@ -50,6 +50,17 @@ module.exports = {
     }
   },
 
+    //get all product
+    async getAllAvailableTable(req, res) {
+      try {
+        const tables = await table.find({ status: "active" });
+        return res.status(200).send(tables);
+      } catch (err) {
+        console.log(err);
+        return res.status(500).send(response("Fail to get all the products"));
+      }
+    },
+
   //delete product by id
   async deleteTable(req, res) {
     try {
