@@ -1,6 +1,9 @@
 const User = require("../../models/user");
+const Store = require("../../models/store");
 const enumType = require("../../common/enum");
 const { response } = require("../../common/response");
+const { uploadProfileImage } = require("../../common/uploadImage");
+const bcrypt = require("bcrypt");
 module.exports = {
   async createUser(req, res) {
     try {
@@ -43,10 +46,75 @@ module.exports = {
       const id = req.auth.id;
       const user = await User.findOne({ id }, ["-password"]);
       if (!user) return res.status(400).send(response("user not found"));
-      return res.status(200).send(response('successful get user', user))
+      return res.status(200).send(response("successful get user", user));
     } catch (err) {
       console.log(err);
       return res.status(500).send(response("fail to get user"));
+    }
+  },
+
+  async updateProfile(req, res) {
+    try {
+      const { username, phoneNumber } = req.body;
+      if (req.file) {
+        var profile = await uploadProfileImage(res, "profile", req.file);
+      }
+      const userId = req.auth.id;
+      await User.updateOne({ userId }, { username, profile, phoneNumber });
+      return res.status(200).send(response("successful update user"));
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send(response("fail to update profile"));
+    }
+  },
+
+  async updateStore(req, res) {
+    try {
+      const { storeName, storeLocation } = req.body;
+      if (req.file) {
+        var storeImage = await uploadProfileImage(res, "profile", req.file);
+      }
+      const storeId = req.auth.storeId;
+      await Store.updateOne(
+        { storeId },
+        { storeName, storeLocation, storeImage }
+      );
+      return res.status(200).send(response("successful update store"));
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send(response("fail to update profile"));
+    }
+  },
+
+  async changePassword(req, res) {
+    try {
+      const { currentPassword, newPassword } = req.body;
+      if (!currentPassword) {
+        return res.status(400).send(response("current password is require"));
+      }
+      if (!newPassword) {
+        return res.status(400).send(response("new password is require"));
+      }
+      const userId = req.auth.id;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(400).send(response("user not found"));
+      }
+      const comparePassword = await bcrypt.compare(currentPassword, user.password)
+      if (!comparePassword) {
+        return res.status(400).send(response('current password incorrect'))
+      }
+      if (currentPassword === newPassword) {
+        return res.status(400).send(response('current password can not same as new password'))
+      }
+
+      const hashPassword = await bcrypt.hash(newPassword, await bcrypt.genSalt())
+      await User.updateOne({ userId },{ password: hashPassword })
+
+      return res.status(200).send(response('successful change password'))
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send(response("fail to change password"));
     }
   },
 };
