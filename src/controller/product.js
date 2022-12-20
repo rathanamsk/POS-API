@@ -154,7 +154,7 @@ module.exports = {
       // find any existing data
     } catch (err) {
       console.log(err);
-      return res.status(500).send(response("Product search fail"));
+      return res.status(500).send(response("Product searchgit fail"));
     }
   },
 };
