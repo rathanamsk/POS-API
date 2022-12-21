@@ -11,7 +11,7 @@ const tableSchema = new mongoose.Schema({
         type: Number
     },
     status: {
-        type: enumType.tableStatus
+        type: String
     }
 })
 
