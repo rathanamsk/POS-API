@@ -24,7 +24,6 @@ module.exports = {
         status: "active",
       });
       if (table_record) return res.status(400).send(response("This table number existed"));
-      console.log("Hello WOrld")
       const newTable = await table.create({
         tableNumber: tableNumber,
         tableName: tableName,
@@ -49,6 +48,16 @@ module.exports = {
       return res.status(500).send(response("Fail to get all the products"));
     }
   },
+
+  //   //get all product
+  async getAllAvailableTable(req, res) {
+      try {
+        const tables = await table.find({ status: "active" });
+        return res.status(200).send(tables);
+      } catch (err) {
+        return res.status(500).send(response("Fail to get all the products"));
+      }
+    },
 
   //delete product by id
   async deleteTable(req, res) {
