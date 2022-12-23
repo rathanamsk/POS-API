@@ -11,6 +11,7 @@ const { expressjwt: expressJwt } = require("express-jwt");
 const UserSession = require("./src/models/userSession");
 const authRouter = require('./src/routes/auth/auth')
 const userRouter = require('./src/routes/auth/user')
+const categoryRouter = require('./src/routes/category')
 const firebase= require('./src/lib/firebase.storage')
 const app = express();
 
@@ -54,7 +55,7 @@ const auth = async (req, res, next) => {
 app.use("/", indexRouter);
 app.use("/auth", jwt(), auth, authRouter)
 app.use("/auth", jwt(), auth, userRouter)
-
+app.use("/store", jwt(), auth, categoryRouter)
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
