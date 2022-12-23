@@ -13,6 +13,8 @@ const UserSession = require("./src/models/userSession");
 const authRouter = require('./src/routes/auth/auth')
 const userRouter = require('./src/routes/auth/user')
 const categoryRouter = require('./src/routes/category')
+const productRouter = require('./src/routes/product')
+const tableRouter = require('./src/routes/table')
 const firebase= require('./src/lib/firebase.storage')
 const app = express();
 
@@ -61,7 +63,8 @@ app.use("/", indexRouter);
 app.use("/auth", jwt(), auth, authRouter)
 app.use("/auth", jwt(), auth, userRouter)
 app.use("/store", jwt(), auth, categoryRouter)
-
+app.use("/store", jwt(), auth, productRouter)
+app.use('/store', jwt(), auth, tableRouter)
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
   next(createError(404));
