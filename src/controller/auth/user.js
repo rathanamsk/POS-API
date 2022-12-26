@@ -58,9 +58,9 @@ module.exports = {
       const storeId = req.auth.storeId
       const store = await Store.findById(storeId)
       if (!store) {
-        return res.status(200).send(response("store not found"));
+        return res.status(400).send(response("store not found"));
       }
-      return store
+      return res.status(200).send(response("successful get store", store))
     }catch(err) {
       console.log(err);
       return res.status(500).send(response("fail to get store"));
