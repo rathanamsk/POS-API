@@ -53,6 +53,20 @@ module.exports = {
     }
   },
 
+  async getStore(req,res) {
+    try{
+      const storeId = req.auth.storeId
+      const store = await Store.findById(storeId)
+      if (!store) {
+        return res.status(200).send(response("store not found"));
+      }
+      return store
+    }catch(err) {
+      console.log(err);
+      return res.status(500).send(response("fail to get store"));
+    }
+  },
+
   async updateProfile(req, res) {
     try {
       const { username, phoneNumber } = req.body;
