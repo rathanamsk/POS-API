@@ -2,20 +2,18 @@ const product = require("../models/product");
 const { response } = require("../common/response");
 const ObjectID = require("mongodb").ObjectID;
 const category = require("../models/catrgory");
+const { uploadProfileImage } = require("../common/uploadImage");
 module.exports = {
   //create product
   async cerateProduct(req, res) {
     try {
-      const { categoryId, productName, productImage, quantity, price } =
-        req.body;
-
+      const { categoryId, productName, quantity, price } = req.body;
       //Product validation
       if (!categoryId)
         return res.status(400).send(response("category ID is require!"));
       if (!productName)
         return res.status(400).send(response("product Name is require!"));
-      if (!productImage)
-        return res.status(400).send(response("product image is require!"));
+
       if (!quantity)
         return res.status(400).send(response("quantity is require!"));
       if (!price) return res.status(400).send(response("price is require!"));
@@ -26,11 +24,14 @@ module.exports = {
         status: "active",
       });
       if (pro) return res.status(400).send(response("Product already exist"));
+      var productImage = req.file;
+
+      var productImg = await uploadProfileImage(res, "product", productImage);
 
       const newPro = await product.create({
         categoriesId: categoryId,
         productName: productName,
-        productImage: productImage,
+        productImage: productImg,
         quantity: quantity,
         price: price,
         status: "active",
@@ -131,7 +132,7 @@ module.exports = {
       if (!productImage) check++;
       if (!quantity) check++;
       if (!price) check++;
-      req.body.status="active"
+      req.body.status = "active";
       if (check < 6) {
         const pro = await product.find(req.body);
         console.log(pro);

@@ -3,8 +3,6 @@ var router = express.Router();
 const categoy = require("./category");
 const product = require("./product");
 const table = require("./table");
-
-
 const dailysellModel=require("../models/dailySell")
 const tableModel = require("../models/table");
 const { response } = require("../common/response");
