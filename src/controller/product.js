@@ -3,6 +3,7 @@ const { response } = require("../common/response");
 const ObjectID = require("mongodb").ObjectID;
 const category = require("../models/catrgory");
 const { uploadProfileImage } = require("../common/uploadImage");
+
 module.exports = {
   //create product
   async cerateProduct(req, res) {
@@ -133,6 +134,7 @@ module.exports = {
       if (!quantity) check++;
       if (!price) check++;
       req.body.status = "active";
+
       if (check < 6) {
         const pro = await product.find(req.body);
         console.log(pro);

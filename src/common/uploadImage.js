@@ -5,6 +5,10 @@ const { response } = require("./response");
 const { v4: uuidv4 } = require("uuid");
 module.exports = {
   async uploadProfileImage(res, path, file) {
+    
+    // path: use "profile" folder for upload profile image or store image
+    // path: use "store" folder for upload store image 
+
     return new Promise((resolve, reject) => {
       if (!["png", "jpg", "jpeg"].includes(file.mimetype.split("/")[1])) {
         return res.status(400).send(response("only png and jpg are allow"));
