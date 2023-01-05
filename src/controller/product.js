@@ -26,8 +26,11 @@ module.exports = {
       });
       if (pro) return res.status(400).send(response("Product already exist"));
       var productImage = req.file;
-
-      var productImg = await uploadProfileImage(res, "product", productImage);
+      try {
+        var productImg = await uploadProfileImage(res, "product", productImage);
+      } catch (error) {
+        return res.send("upload error")
+      }
 
       const newPro = await product.create({
         categoriesId: categoryId,
