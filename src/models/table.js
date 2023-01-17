@@ -1,6 +1,10 @@
 const mongoose = require('mongoose')
 const enumType = require('../common/enum')
 const tableSchema = new mongoose.Schema({
+    storeId: {
+        type: mongoose.Schema.ObjectId,
+        ref: "Store"
+    },
     tableNumber: {
         type: Number
     },
