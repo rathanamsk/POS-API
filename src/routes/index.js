@@ -3,6 +3,7 @@ var router = express.Router();
 const categoy = require("./category");
 const product = require("./product");
 const table = require("./table");
+const dailySell = require("./dailySell");
 const invoice = require("./invoice")
 
 const dailysellModel=require("../models/dailySell")
@@ -27,5 +28,6 @@ router.use("/", categoy);
 router.use("/", product);
 router.use("/", table);
 router.use("/", invoice);
+router.use("/", dailySell);
 
 module.exports = router;

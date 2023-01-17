@@ -1,11 +1,14 @@
+const dailySell = require("../models/dailySell");
+const product = require("../models/product");
 var easyinvoice = require('easyinvoice');
 const router = require('express').Router()
-router.get('/invoice', createInvoice)
+const ObjectID = require("mongodb").ObjectID;
+router.get('/invoice/(:id)', createInvoice)
 var data = {
     //"documentTitle": "RECEIPT", //Defaults to INVOICE
     //"locale": "de-DE", //Defaults to en-US, used for number formatting (see docs)
     "currency": "USD", //See documentation 'Locales and Currency' for more info
-    "taxNotation": "vat", //or gst
+    "taxNotation": "VAT", //or gst
     "marginTop": 25,
     "marginRight": 25,
     "marginLeft": 25,
@@ -69,7 +72,28 @@ var data = {
 };
 
 async function createInvoice(req, res) {
+    const id = req.params.id;
+    /* {
+        "quantity": "2",
+        "description": "First Product",
+        "tax": 6,
+        "price": 33.87
+    }*/
+    products = [];
+    const sales = await dailySell.find({ tableId: ObjectID(id),status: "active" }).populate('productId');
+
+    sales.forEach(async ele => {
+        line = {
+            "quantity": ele['quantity'],
+            "description": ele['productId']['productName'],
+            "price": ele['quantity']*ele['productId']['price']
+        }
+        products.push(line)
+    })
+    data['products'] = products;
     const result = await easyinvoice.createInvoice(data);
+    var fs = require('fs');
+    await fs.writeFileSync("invoice.pdf", result.pdf, 'base64');
     return res.status(200).send(result.pdf);
 };
 
