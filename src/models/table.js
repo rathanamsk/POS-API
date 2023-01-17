@@ -14,10 +14,8 @@ const tableSchema = new mongoose.Schema({
         type: String
     }
 })
-
 tableSchema.set('timestamps', {
     createdAt: "createdAt",
     updatedAt: "updatedAt"
 })
-
 module.exports = mongoose.model('Table', tableSchema);

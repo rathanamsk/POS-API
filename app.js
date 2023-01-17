@@ -9,12 +9,14 @@ const cors = require('cors')
 const indexRouter = require("./src/routes/index");
 const dbConnection = require("./src/lib/mongo.connection");
 const { expressjwt: expressJwt } = require("express-jwt");
+const { response } = require('./src/common/response')
 const UserSession = require("./src/models/userSession");
 const authRouter = require('./src/routes/auth/auth')
 const userRouter = require('./src/routes/auth/user')
 const categoryRouter = require('./src/routes/category')
 const productRouter = require('./src/routes/product')
 const tableRouter = require('./src/routes/table')
+const roleBaseRouter = require('./src/routes/auth/role-base/create-user')
 const firebase= require('./src/lib/firebase.storage')
 const app = express();
 
@@ -58,9 +60,21 @@ const auth = async (req, res, next) => {
   const user = await UserSession.findOne({ token });
   !user ? next(createError.Unauthorized()) : next();
 };
+// role check 
+
+const role = function(role){
+  return (req,res,next)=>{
+    const roleUser = req.auth.role
+    if(roleUser!=role){
+      return res.status(401).send(response(`Unauthorized!!, only for ${role}`))
+    }
+    next()
+  }
+}
 
 app.use("/", indexRouter);
 app.use("/auth", jwt(), auth, authRouter)
+app.use("/auth", jwt(), auth, role('ADMIN'), roleBaseRouter)
 app.use("/auth", jwt(), auth, userRouter)
 app.use("/store", jwt(), auth, categoryRouter)
 app.use("/store", jwt(), auth, productRouter)

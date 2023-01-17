@@ -25,8 +25,10 @@ module.exports = {
           .status(400)
           .send(response("User phone number already exist"));
 
+      const hashPassword = await bcrypt.hash(password, await bcrypt.genSalt(16))
       await User.create({
         storeId: req.auth.storeId,
+        password:hashPassword,
         username,
         email,
         phoneNumber,
