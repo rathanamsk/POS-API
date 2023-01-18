@@ -24,7 +24,7 @@ module.exports = {
           productId: pro_id,
           quantity: quantity,
           status: "ACTIVE",
-        })
+        });
       });
       Promise.all[
         await table.updateOne(
@@ -144,7 +144,7 @@ module.exports = {
 
   async confirmPayment(req, res) {
     try {
-      const { tableId } = req.params.id;
+      const tableId = req.params.id;
 
       if (!tableId) {
         return res.status(400).send(response("table id is require"));
@@ -154,10 +154,13 @@ module.exports = {
         return res.status(400).send(response("table not found"));
       }
 
-      await table.updateOne(
-        { _id: new ObjectID(tableId) },
-        { status: "ACTIVE" }
-      );
+      Promise.all[
+        (await table.updateOne(
+          { _id: new ObjectID(tableId) },
+          { status: "ACTIVE" }
+        ),
+        await dailySell.updateMany({ tableId }, { status: "IN_ACTIVE" }))
+      ];
       return res.status(200).send(response("confirm payment successful"));
     } catch (err) {
       console.log(err);
