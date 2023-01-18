@@ -6,13 +6,16 @@ const tableSchema = new mongoose.Schema({
         ref: "Store"
     },
     tableNumber: {
-        type: Number
+        type: Number,
+        default: "NaN"
     },
     tableName: {
-        type: String
+        type: String,
+        default: "NaN"
     },
     chairs: {
-        type: Number
+        type: Number,
+        default: "NaN"
     },
     status: {
         type: String

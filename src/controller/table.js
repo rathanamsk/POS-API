@@ -11,10 +11,6 @@ module.exports = {
       //Product validation
       if (!tableNumber)
         return res.status(400).send(response("Table number is require!"));
-      if (!tableName)
-        return res.status(400).send(response("Table Name is require!"));
-      if (!chairs)
-        return res.status(400).send(response("Chair quantity is require!"));
 
       // find any existing data
       const table_record = await table.findOne({
