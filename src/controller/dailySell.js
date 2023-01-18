@@ -10,20 +10,23 @@ module.exports = {
       // check table valid
 
       //Product validation
+
       if (!tableId)
         return res.status(400).send(response("Table id is require!"));
-      if (!productId)
+      if (!productId.length)
         return res.status(400).send(response("product id is require!"));
       if (!quantity)
         return res.status(400).send(response("product quantity is require!"));
 
-      Promise.all[
-        (await dailySell.create({
+      productId.forEach(async (pro_id) => {
+        await dailySell.create({
           tableId: tableId,
-          productId: productId,
+          productId: pro_id,
           quantity: quantity,
           status: "ACTIVE",
-        }),
+        })
+      });
+      Promise.all[
         await table.updateOne(
           {
             _id: new ObjectID(tableId),
@@ -31,7 +34,7 @@ module.exports = {
           {
             status: "IN_ACTIVE",
           }
-        ))
+        )
       ];
       return res.status(200).send(response("Sale created successful"));
     } catch (err) {
@@ -61,18 +64,20 @@ module.exports = {
     }
   },
 
-  async getOrderTable(req,res) {
+  async getOrderTable(req, res) {
     try {
       const tableId = req.params.id;
       if (!tableId) {
         return res.status(400).send(response("table id params is require!"));
       }
-      const find_table = await table.findById(tableId)
+      const find_table = await table.findById(tableId);
       if (!find_table) {
         return res.status(400).send(response("table not found"));
       }
-      const order = await dailySell.find({ tableId, status: "ACTIVE" })
-      return res.status(200).send(response("successful get order of table", order));
+      const order = await dailySell.find({ tableId, status: "ACTIVE" });
+      return res
+        .status(200)
+        .send(response("successful get order of table", order));
     } catch (err) {
       console.log(err);
       return res.status(500).send(response("Fail to get order"));
