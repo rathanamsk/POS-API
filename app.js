@@ -29,7 +29,8 @@ firebase()
 
 //cors origin 
 app.use(cors({
-  origin: '*'
+  origin: '*',
+  optionsSuccessStatus: 200
 }));
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
