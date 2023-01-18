@@ -59,6 +59,10 @@ module.exports = {
   async deleteTable(req, res) {
     try {
       const id = req.params.id;
+      const tableId = await (await table.find({ status: "ACTIVE", storeId: req.auth.storeId })).map((data) => data.id)
+      if (!tableId.includes(tableId)) {
+        return res.status(400).send(response("table invalid"));
+      }
       //Product validation
       if (!id) return res.status(400).send(response("id is require!"));
 
