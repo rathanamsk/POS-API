@@ -1,6 +1,7 @@
 const dailySell = require("../models/dailySell");
 const product = require("../models/product");
 var easyinvoice = require('easyinvoice');
+const { response } = require("../common/response");
 const router = require('express').Router()
 const ObjectID = require("mongodb").ObjectID;
 router.get('/invoice/(:id)', createInvoice)
@@ -80,21 +81,20 @@ async function createInvoice(req, res) {
         "price": 33.87
     }*/
     products = [];
-    const sales = await dailySell.find({ tableId: ObjectID(id),status: "active" }).populate('productId');
+    const sales = await dailySell.find({ tableId: ObjectID(id),status: "ACTIVE" }).populate('productId');
 
     sales.forEach(async ele => {
         line = {
             "quantity": ele['quantity'],
             "description": ele['productId']['productName'],
-            "price": ele['quantity']*ele['productId']['price']
+            "price": ele['productId']['price']
         }
         products.push(line)
     })
     data['products'] = products;
     const result = await easyinvoice.createInvoice(data);
-    var fs = require('fs');
-    await fs.writeFileSync("invoice.pdf", result.pdf, 'base64');
-    return res.status(200).send(result.pdf);
+    // console.log(result.pdf);
+    return res.status(200).send(response("successful get invoice",{ base64: result.pdf}));
 };
 
 module.exports = router;

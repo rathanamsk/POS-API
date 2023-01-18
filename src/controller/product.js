@@ -49,7 +49,6 @@ module.exports = {
   async getAllProduct(req, res) {
     try {
       const newPro = await product.find({ status: "active" });
-
       return res.status(200).send(newPro);
     } catch (err) {
       console.log(err);

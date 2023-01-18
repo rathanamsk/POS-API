@@ -2,7 +2,7 @@ const product = require('../controller/product');
 const router = require('express').Router()
 const upload = require('multer')();
 
-router.post('/product', upload.single('file'), product.cerateProduct)
+router.post('/product', upload.single('productFile'), product.cerateProduct)
 router.get('/product', product.getAllProduct)
 router.delete('/product/(:id)', product.deleteProduct)
 router.put('/product/(:id)', product.updateProduct)

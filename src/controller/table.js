@@ -5,7 +5,7 @@ module.exports = {
   //create table
   async createTable(req, res) {
     try {
-      const { tableNumber, tableName, chairs, status } =
+      const { tableNumber, tableName, chairs } =
         req.body;
 
       //Product validation
@@ -15,8 +15,6 @@ module.exports = {
         return res.status(400).send(response("Table Name is require!"));
       if (!chairs)
         return res.status(400).send(response("Chair quantity is require!"));
-      if (!status)
-        return res.status(400).send(response("Status is require!"));
 
       // find any existing data
       const table_record = await table.findOne({
@@ -28,7 +26,7 @@ module.exports = {
         tableNumber: tableNumber,
         tableName: tableName,
         chairs: chairs,
-        status: status,
+        status: "ACTIVE",
       });
 
       return res.status(200).send(response("Table created successful"));
@@ -41,7 +39,7 @@ module.exports = {
   //get all product
   async getAllTable(req, res) {
     try {
-      const tables = await table.find({ status: "active" });
+      const tables = await table.find({ status: "ACTIVE" });
       return res.status(200).send(tables);
     } catch (err) {
       console.log(err);

@@ -6,7 +6,9 @@ module.exports = {
   async createSale(req, res) {
     try {
       const { tableId, productId, quantity } = req.body;
+      // check table valid 
 
+      
       //Product validation
       if (!tableId)
         return res.status(400).send(response("Table id is require!"));
