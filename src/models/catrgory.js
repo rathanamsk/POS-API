@@ -5,6 +5,9 @@ const categoriesSchema = new mongoose.Schema({
     categoriesName: {
         type: String
     },
+    storeId: {
+        type: String
+    },
     status: {
         type: String
     }

@@ -17,8 +17,8 @@ router.get("/", function (req, res, next) {
 router.post("/confirm-payment", async function (req, res, next) {
   const { dailysellId, tabelId } = req.body;
   try {
-    await tableModel.updateOne({ _id: new ObjectID(tabelId) }, {status : "active"});
-    await dailysellModel.updateOne({ _id: new ObjectID(dailysellId) }, {status : "inactive"});
+    await tableModel.updateOne({ _id: new ObjectID(tabelId) }, {status : "ACTIVE"});
+    await dailysellModel.updateOne({ _id: new ObjectID(dailysellId) }, {status : "IN_ACTIVE"});
     return res.status(200).send(response("confirm payment sucess"));
   } catch (error) {
     return res.status(500).send(response("confirm payment fail"));

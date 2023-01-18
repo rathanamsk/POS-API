@@ -1,14 +1,14 @@
 const { response } = require("../common/response");
 const dailySell = require("../models/dailySell");
+const table = require("../models/table");
 const ObjectID = require("mongodb").ObjectID;
 module.exports = {
   //create table
   async createSale(req, res) {
     try {
       const { tableId, productId, quantity } = req.body;
-      // check table valid 
+      // check table valid
 
-      
       //Product validation
       if (!tableId)
         return res.status(400).send(response("Table id is require!"));
@@ -17,13 +17,22 @@ module.exports = {
       if (!quantity)
         return res.status(400).send(response("product quantity is require!"));
 
-      const newTable = await dailySell.create({
-        tableId: tableId,
-        productId: productId,
-        quantity: quantity,
-        status: 'active',
-      });
-
+      Promise.all[
+        (await dailySell.create({
+          tableId: tableId,
+          productId: productId,
+          quantity: quantity,
+          status: "ACTIVE",
+        }),
+        await table.updateOne(
+          {
+            _id: new ObjectID(tableId),
+          },
+          {
+            status: "IN_ACTIVE",
+          }
+        ))
+      ];
       return res.status(200).send(response("Sale created successful"));
     } catch (err) {
       console.log(err);
@@ -34,7 +43,7 @@ module.exports = {
   //get all product
   async getAllAvailableSale(req, res) {
     try {
-      const sales = await dailySell.find({ status: "active" });
+      const sales = await dailySell.find({ status: "ACTIVE" });
       return res.status(200).send(sales);
     } catch (err) {
       console.log(err);
@@ -44,13 +53,31 @@ module.exports = {
 
   //   //get all product
   async getAllSale(req, res) {
-      try {
-        const sales = await dailySell.find();
-        return res.status(200).send(sales);
-      } catch (err) {
-        return res.status(500).send(response("Fail to get all the products"));
+    try {
+      const sales = await dailySell.find();
+      return res.status(200).send(sales);
+    } catch (err) {
+      return res.status(500).send(response("Fail to get all the products"));
+    }
+  },
+
+  async getOrderTable(req,res) {
+    try {
+      const tableId = req.params.id;
+      if (!tableId) {
+        return res.status(400).send(response("table id params is require!"));
       }
-    },
+      const find_table = await table.findById(tableId)
+      if (!find_table) {
+        return res.status(400).send(response("table not found"));
+      }
+      const order = await dailySell.find({ tableId, status: "ACTIVE" })
+      return res.status(200).send(response("successful get order of table", order));
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send(response("Fail to get order"));
+    }
+  },
 
   //delete product by id
   async deleteSale(req, res) {
@@ -66,7 +93,7 @@ module.exports = {
 
       const newSale = await table.updateOne(
         { _id: new ObjectID(id) },
-        { status: "inactive" }
+        { status: "IN_ACTIVE" }
       );
       return res.status(200).send(response("Table delete successful"));
     } catch (err) {
@@ -96,10 +123,10 @@ module.exports = {
       const updateSale = await dailySell.updateOne(
         { _id: new ObjectID(id) },
         {
-            tableId: tableId,
-            productId: productId,
-            quantity: quantity,
-            status: 'active',
+          tableId: tableId,
+          productId: productId,
+          quantity: quantity,
+          status: "ACTIVE",
         }
       );
 
@@ -107,6 +134,29 @@ module.exports = {
     } catch (err) {
       console.log(err);
       return res.status(500).send(response("Sale update fail"));
+    }
+  },
+
+  async confirmPayment(req, res) {
+    try {
+      const { tableId } = req.params.id;
+
+      if (!tableId) {
+        return res.status(400).send(response("table id is require"));
+      }
+      const find_table = await table.findById(tableId);
+      if (!find_table) {
+        return res.status(400).send(response("table not found"));
+      }
+
+      await table.updateOne(
+        { _id: new ObjectID(tableId) },
+        { status: "ACTIVE" }
+      );
+      return res.status(200).send(response("confirm payment successful"));
+    } catch (err) {
+      console.log(err);
+      return res.status(500).send(response("confirm payment fail"));
     }
   },
 };

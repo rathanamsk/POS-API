@@ -93,7 +93,7 @@ async function createInvoice(req, res) {
     })
     data['products'] = products;
     const result = await easyinvoice.createInvoice(data);
-    // console.log(result.pdf);
+    console.log(result.pdf);
     return res.status(200).send(response("successful get invoice",{ base64: result.pdf}));
 };
 

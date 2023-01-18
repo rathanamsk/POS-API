@@ -22,20 +22,22 @@ module.exports = {
       // find any existing data
       const pro = await product.findOne({
         productName: productName,
-        status: "active",
+        status: "ACTIVE",
+        categoryId
       });
+      console.log(pro, categoryId);
       if (pro) return res.status(400).send(response("Product already exist"));
       var productImage = req.file;
 
       var productImg = await uploadProfileImage(res, "product", productImage);
 
-      const newPro = await product.create({
+      await product.create({
         categoriesId: categoryId,
         productName: productName,
         productImage: productImg,
         quantity: quantity,
         price: price,
-        status: "active",
+        status: "ACTIVE",
       });
 
       return res.status(200).send(response("Product cerate successful"));
@@ -48,8 +50,9 @@ module.exports = {
   //get all product
   async getAllProduct(req, res) {
     try {
-      const newPro = await product.find({ status: "active" });
-      return res.status(200).send(newPro);
+      const categoriesId = await (await category.find({ status: "ACTIVE", storeId: req.auth.storeId})).map((res)=> res.id)
+      const newPro = await product.find({ status: "ACTIVE", categoriesId });
+      return res.status(200).send(response('successful get product',newPro));
     } catch (err) {
       console.log(err);
       return res.status(500).send(response("Product get fail"));
@@ -70,7 +73,7 @@ module.exports = {
 
       const newPro = await product.updateOne(
         { _id: new ObjectID(id) },
-        { status: "inactive" }
+        { status: "IN_ACTIVE" }
       );
       return res.status(200).send(response("Product delete successful"));
     } catch (err) {
@@ -132,7 +135,7 @@ module.exports = {
       if (!productImage) check++;
       if (!quantity) check++;
       if (!price) check++;
-      req.body.status = "active";
+      req.body.status = "ACTIVE";
 
       if (check < 6) {
         const pro = await product.find(req.body);

@@ -5,5 +5,7 @@ router.get('/dailySell', dailySell.getAllSale)
 router.delete('/dailySell/(:id)', dailySell.deleteSale)
 router.put('/dailySell/(:id)', dailySell.updateSale)
 router.get('/dailySell-available',dailySell.getAllAvailableSale)
+router.get('/dailySell/confirm_payment/(:id)',dailySell.confirmPayment)
+router.get('/dailySell/order/(:id)', dailySell.getOrderTable)
 
 module.exports = router;

@@ -19,11 +19,13 @@ module.exports = {
       // find any existing data
       const table_record = await table.findOne({
         tableNumber: tableNumber,
-        status: "active",
+        storeId: req.auth.storeId,
+        status: "ACTIVE",
       });
       if (table_record) return res.status(400).send(response("This table number existed"));
-      const newTable = await table.create({
+      await table.create({
         tableNumber: tableNumber,
+        storeId: req.auth.storeId,
         tableName: tableName,
         chairs: chairs,
         status: "ACTIVE",
@@ -39,7 +41,7 @@ module.exports = {
   //get all product
   async getAllTable(req, res) {
     try {
-      const tables = await table.find({ status: "ACTIVE" });
+      const tables = await table.find({ storeId: req.auth.storeId });
       return res.status(200).send(tables);
     } catch (err) {
       console.log(err);
@@ -50,7 +52,7 @@ module.exports = {
   //   //get all product
   async getAllAvailableTable(req, res) {
       try {
-        const tables = await table.find({ status: "active" });
+        const tables = await table.find({ status: "ACTIVE", storeId: req.auth.storeId});
         return res.status(200).send(tables);
       } catch (err) {
         return res.status(500).send(response("Fail to get all the products"));
@@ -71,7 +73,7 @@ module.exports = {
 
       const newTable = await table.updateOne(
         { _id: new ObjectID(id) },
-        { status: "inactive" }
+        { status: "IN_ACTIVE" }
       );
       return res.status(200).send(response("Table delete successful"));
     } catch (err) {
@@ -102,13 +104,13 @@ module.exports = {
       if (table_record === null)
         return res.status(400).send(response("id do not exist"));
 
-      const updateTable = await table.updateOne(
+      await table.updateOne(
         { _id: new ObjectID(id) },
         {
           tableNumber: tableNumber,
           tableName: tableName,
           chairs: chairs,
-          status: "active",
+          status: "ACTIVE",
         }
       );
 
