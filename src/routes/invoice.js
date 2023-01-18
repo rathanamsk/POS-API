@@ -4,10 +4,11 @@ var easyinvoice = require('easyinvoice');
 const router = require('express').Router()
 const ObjectID = require("mongodb").ObjectID;
 const fs = require('fs');
+const { response } = require("../common/response");
 router.get('/invoice/(:id)', createInvoice)
 var html;
 try {
-     html = fs.readFileSync('src/routes/invoice.html', 'utf8');
+     html = fs.readFileSync(__dirname+'/invoice.html', 'utf8');
   } catch (err) {
     console.error(err);
   }
@@ -100,21 +101,19 @@ async function createInvoice(req, res) {
         "price": 33.87
     }*/
     products = [];
-    const sales = await dailySell.find({ tableId: ObjectID(id),status: "active" }).populate('productId');
+    const sales = await dailySell.find({ tableId: ObjectID(id),status: "ACTIVE" }).populate('productId');
 
     sales.forEach(async ele => {
         line = {
             "quantity": ele['quantity'],
             "description": ele['productId']['productName'],
-            "price": ele['quantity']*ele['productId']['price']
+            "price": ele['productId']['price']
         }
         products.push(line)
     })
     data['products'] = products;
     const result = await easyinvoice.createInvoice(data);
-    var fs = require('fs');
-    await fs.writeFileSync("invoice.pdf", result.pdf, 'base64');
-    return res.status(200).send(result.pdf);
+    return res.status(200).send(response("invoice", { base64: result.pdf }));
 };
 
 module.exports = router;
