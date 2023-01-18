@@ -1,11 +1,32 @@
 const dailySell = require("../models/dailySell");
 const product = require("../models/product");
 var easyinvoice = require('easyinvoice');
-const { response } = require("../common/response");
 const router = require('express').Router()
 const ObjectID = require("mongodb").ObjectID;
+const fs = require('fs');
 router.get('/invoice/(:id)', createInvoice)
+var html;
+try {
+     html = fs.readFileSync('src/routes/invoice.html', 'utf8');
+  } catch (err) {
+    console.error(err);
+  }
 var data = {
+    customize: {
+        // btoa === base64 encode
+        template: Buffer.from(html).toString('base64') // Your template must be base64 encoded
+    },
+    information: {
+        'number': '2023.0001',
+        'date': '18 Jan 2023',
+        'due-date': '18 Feb 2023'
+    },
+    "images": {
+        // The logo on top of your invoice
+        "logo": "https://public.easyinvoice.cloud/img/logo_en_original.png",
+        // The invoice background
+        // "background": "https://public.easyinvoice.cloud/img/watermark-draft.jpg"
+    },
     //"documentTitle": "RECEIPT", //Defaults to INVOICE
     //"locale": "de-DE", //Defaults to en-US, used for number formatting (see docs)
     "currency": "USD", //See documentation 'Locales and Currency' for more info
@@ -14,8 +35,6 @@ var data = {
     "marginRight": 25,
     "marginLeft": 25,
     "marginBottom": 25,
-    "logo": "https://public.easyinvoice.cloud/img/logo_en_original.png", //or base64
-    "background": "https://public.easyinvoice.cloud/img/watermark-draft.jpg", //or base64 //img or pdf
     "sender": {
         "company": "Sample Corp",
         "address": "Sample Street 123",
@@ -81,20 +100,21 @@ async function createInvoice(req, res) {
         "price": 33.87
     }*/
     products = [];
-    const sales = await dailySell.find({ tableId: ObjectID(id),status: "ACTIVE" }).populate('productId');
+    const sales = await dailySell.find({ tableId: ObjectID(id),status: "active" }).populate('productId');
 
     sales.forEach(async ele => {
         line = {
             "quantity": ele['quantity'],
             "description": ele['productId']['productName'],
-            "price": ele['productId']['price']
+            "price": ele['quantity']*ele['productId']['price']
         }
         products.push(line)
     })
     data['products'] = products;
     const result = await easyinvoice.createInvoice(data);
-    console.log(result.pdf);
-    return res.status(200).send(response("successful get invoice",{ base64: result.pdf}));
+    var fs = require('fs');
+    await fs.writeFileSync("invoice.pdf", result.pdf, 'base64');
+    return res.status(200).send(result.pdf);
 };
 
 module.exports = router;
